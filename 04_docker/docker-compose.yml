@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    container_name: vpn_postgres
+    environment:
+      POSTGRES_DB: vpn_management
+      POSTGRES_USER: vpn_user
+      POSTGRES_PASSWORD: vpn_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - vpn_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  vpn_postgres_data:
