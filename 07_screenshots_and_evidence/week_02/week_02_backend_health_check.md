@@ -12,4 +12,4 @@ GET http://localhost:3000/api/health
 Result:
 Backend server started successfully and returned a JSON response.
 
-![API](../07_screenshots_and_evidence/week_02_api_establishment.png)
+![API](./week_02_api_establishment.png)

@@ -19,4 +19,4 @@ POST http://localhost:3000/api/users
 
 All objectives were successfully achieved. 
 
-![TESTED USER](../07_screenshots_and_evidence/week_02_test_user.png)
+![TESTED USER](./week_02_create_user_test.md)

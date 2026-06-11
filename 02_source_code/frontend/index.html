@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>VPN User Management System</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header>
+			<h1>VPN User Management System</h1>
+			<p>Manage VPN users, access status, and expiry dates.</p>
+		</header>
+
+		<main>
+			<section class="card">
+				<h2>Create VPN User</h2>
+
+				<form id="createUserForm">
+					<label>
+						Full Name
+						<input type="text" id="fullName" required />
+					</label>
+
+					<label>
+						Email
+						<input type="email" id="email" required />
+					</label>
+
+					<label>
+						VPN Username
+						<input type="text" id="vpnUsername" required />
+					</label>
+
+					<label>
+						Status
+						<select id="status">
+							<option value="active">Active</option>
+							<option value="inactive">Inactive</option>
+							<option value="expired">Expired</option>
+						</select>
+					</label>
+
+					<label>
+						Expiry Date
+						<input type="date" id="expiryDate" required />
+					</label>
+
+					<button type="submit">Create User</button>
+				</form>
+
+				<p id="formMessage"></p>
+			</section>
+
+			<section class="card">
+				<h2>VPN Users</h2>
+
+				<button id="loadUsersBtn">Load Users</button>
+
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Full Name</th>
+							<th>Email</th>
+							<th>VPN Username</th>
+							<th>Status</th>
+							<th>Expiry Date</th>
+						</tr>
+					</thead>
+					<tbody id="usersTableBody">
+						<tr>
+							<td colspan="6">No users loaded yet.</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+		</main>
+
+		<script src="app.js"></script>
+	</body>
+</html>

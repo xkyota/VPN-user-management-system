@@ -19,4 +19,4 @@ The backend successfully connected to the PostgreSQL database.
 
 All objectives were successfully achieved. 
 
-![TESTED DATABASE](../07_screenshots_and_evidence/week_02_database_test.png)
+![TESTED DATABASE](./week_02_database_test.png)
