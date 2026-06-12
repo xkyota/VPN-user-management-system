@@ -19,3 +19,4 @@ The selected VPN user should be deleted from the PostgreSQL database and removed
 ## Result
 
 The VPN user was successfully deleted through the frontend interface.
+
