@@ -81,3 +81,11 @@ select {
 #formMessage {
 	font-weight: bold;
 }
+
+.delete-btn {
+  background: #dc2626;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+}

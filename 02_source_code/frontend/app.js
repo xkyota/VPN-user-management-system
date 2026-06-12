@@ -25,15 +25,24 @@ const loadUsers = async () => {
 			const row = document.createElement("tr");
 
 			row.innerHTML = `
-        <td>${user.id}</td>
-        <td>${user.full_name}</td>
-        <td>${user.email}</td>
-        <td>${user.vpn_username}</td>
-        <td>${user.status}</td>
-        <td>${new Date(user.expiry_date).toLocaleDateString()}</td>
-      `;
+  				<td>${user.id}</td>
+  				<td>${user.full_name}</td>
+  				<td>${user.email}</td>
+  				<td>${user.vpn_username}</td>
+  				<td>${user.status}</td>
+  				<td>${new Date(user.expiry_date).toLocaleDateString()}</td>
+  				<td>
+   					<button class="delete-btn" data-id="${user.id}">Delete</button>
+				</td>
+`;
 
 			usersTableBody.appendChild(row);
+
+			const deleteButton = row.querySelector(".delete-btn");
+
+			deleteButton.addEventListener("click", () => {
+				deleteUser(user.id);
+			});
 		});
 	} catch (error) {
 		usersTableBody.innerHTML = `
@@ -43,6 +52,33 @@ const loadUsers = async () => {
     `;
 
 		console.error("Failed to load users:", error);
+	}
+};
+
+const deleteUser = async (id) => {
+	const confirmed = confirm("Are you sure you want to delete this VPN user?");
+
+	if (!confirmed) {
+		return;
+	}
+
+	try {
+		const response = await fetch(`${API_URL}/${id}`, {
+			method: "DELETE",
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			alert(data.message || "Failed to delete user.");
+			return;
+		}
+
+		alert("VPN user deleted successfully.");
+		loadUsers();
+	} catch (error) {
+		alert("Failed to connect to backend.");
+		console.error("Delete user error:", error);
 	}
 };
 
