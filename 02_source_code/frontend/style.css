@@ -83,9 +83,18 @@ select {
 }
 
 .delete-btn {
-  background: #dc2626;
+	background: #dc2626;
 }
 
 .delete-btn:hover {
-  background: #b91c1c;
+	background: #b91c1c;
+}
+
+.edit-btn {
+	background: #16a34a;
+	margin-right: 8px;
+}
+
+.edit-btn:hover {
+	background: #15803d;
 }
