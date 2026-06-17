@@ -98,3 +98,27 @@ select {
 .edit-btn:hover {
 	background: #15803d;
 }
+
+.users-controls {
+	display: flex;
+	gap: 12px;
+	margin: 20px 0;
+	flex-wrap: wrap;
+}
+
+.users-controls input,
+.users-controls select {
+	padding: 10px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+.users-controls input {
+	min-width: 260px;
+	flex: 1;
+}
+
+.users-controls select {
+	min-width: 160px;
+}
