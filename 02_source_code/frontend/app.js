@@ -17,6 +17,8 @@ const activeUsersElement = document.getElementById("activeUsers");
 const inactiveUsersElement = document.getElementById("inactiveUsers");
 const expiredUsersElement = document.getElementById("expiredUsers");
 
+const userDetailsContent = document.getElementById("userDetailsContent");
+
 const API_URL = "http://localhost:3000/api/users";
 
 let editingUserId = null;
@@ -107,6 +109,7 @@ const renderUsers = () => {
       <td>${user.status}</td>
       <td>${new Date(user.expiry_date).toLocaleDateString()}</td>
       <td>
+        <button class="view-btn">View</button>
         <button class="edit-btn">Edit</button>
         <button class="delete-btn">Delete</button>
       </td>
@@ -114,8 +117,13 @@ const renderUsers = () => {
 
 		usersTableBody.appendChild(row);
 
+		const viewButton = row.querySelector(".view-btn");
 		const editButton = row.querySelector(".edit-btn");
 		const deleteButton = row.querySelector(".delete-btn");
+
+		viewButton.addEventListener("click", () => {
+			showUserDetails(user);
+		});
 
 		editButton.addEventListener("click", () => {
 			startEditUser(user);
@@ -125,6 +133,27 @@ const renderUsers = () => {
 			deleteUser(user.id);
 		});
 	});
+};
+
+const showUserDetails = (user) => {
+	userDetailsContent.innerHTML = `
+    <div class="details-card">
+      <p><strong>ID:</strong> ${user.id}</p>
+      <p><strong>Full name:</strong> ${user.full_name}</p>
+      <p><strong>Email:</strong> ${user.email}</p>
+      <p><strong>VPN username:</strong> ${user.vpn_username}</p>
+      <p><strong>Status:</strong> ${user.status}</p>
+      <p><strong>Expiry date:</strong> ${new Date(
+			user.expiry_date,
+		).toLocaleDateString()}</p>
+      <p><strong>Created at:</strong> ${new Date(
+			user.created_at,
+		).toLocaleString()}</p>
+      <p><strong>Updated at:</strong> ${new Date(
+			user.updated_at,
+		).toLocaleString()}</p>
+    </div>
+  `;
 };
 
 const startEditUser = (user) => {

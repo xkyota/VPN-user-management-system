@@ -17,7 +17,7 @@ header {
 }
 
 main {
-	max-width: 1000px;
+	max-width: 1100px;
 	margin: 30px auto;
 	padding: 0 16px;
 }
@@ -31,12 +31,12 @@ main {
 
 button {
 	padding: 10px 16px;
-	margin-bottom: 16px;
 	border: none;
 	border-radius: 6px;
 	background: #2563eb;
 	color: white;
 	cursor: pointer;
+	font-weight: 600;
 }
 
 button:hover {
@@ -57,6 +57,19 @@ td {
 
 th {
 	background: #f0f2f5;
+}
+
+td:last-child {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+td:last-child button {
+	padding: 8px 12px;
+	font-size: 14px;
+	white-space: nowrap;
 }
 
 form {
@@ -82,21 +95,28 @@ select {
 	font-weight: bold;
 }
 
+.view-btn {
+	background: #2563eb;
+}
+
+.view-btn:hover {
+	background: #1d4ed8;
+}
+
+.edit-btn {
+	background: #16a34a;
+}
+
+.edit-btn:hover {
+	background: #15803d;
+}
+
 .delete-btn {
 	background: #dc2626;
 }
 
 .delete-btn:hover {
 	background: #b91c1c;
-}
-
-.edit-btn {
-	background: #16a34a;
-	margin-right: 8px;
-}
-
-.edit-btn:hover {
-	background: #15803d;
 }
 
 .users-controls {
@@ -150,6 +170,24 @@ select {
 	color: #0f172a;
 }
 
+.user-details {
+	background: #ffffff;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 20px;
+	margin: 24px 0;
+}
+
+.user-details h2 {
+	margin-bottom: 12px;
+	color: #0f172a;
+}
+
+.details-card p {
+	margin: 8px 0;
+	color: #334155;
+}
+
 @media (max-width: 768px) {
 	.dashboard {
 		grid-template-columns: repeat(2, 1fr);
@@ -159,5 +197,14 @@ select {
 @media (max-width: 480px) {
 	.dashboard {
 		grid-template-columns: 1fr;
+	}
+
+	td:last-child {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	td:last-child button {
+		width: 100%;
 	}
 }
