@@ -1,4 +1,5 @@
 const usersRoutes = require('./routes/users');
+const activityLogsRoutes = require("./routes/activityLogs");
 
 const express = require('express');
 const cors = require('cors');
@@ -11,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/users', usersRoutes);
+app.use("/api/activity-logs", activityLogsRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({
