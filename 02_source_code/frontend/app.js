@@ -19,7 +19,11 @@ const expiredUsersElement = document.getElementById("expiredUsers");
 
 const userDetailsContent = document.getElementById("userDetailsContent");
 
+const logsTableBody = document.getElementById("logsTableBody");
+const loadLogsBtn = document.getElementById("loadLogsBtn");
+
 const API_URL = "http://localhost:3000/api/users";
+const LOGS_URL = "http://localhost:3000/api/activity-logs";
 
 let editingUserId = null;
 let allUsers = [];
@@ -254,3 +258,45 @@ searchInput.addEventListener("input", renderUsers);
 statusFilter.addEventListener("change", renderUsers);
 
 loadUsers();
+
+const getBadgeClass = (action) => {
+	if (action.includes("created")) return "badge-created";
+	if (action.includes("updated")) return "badge-updated";
+	if (action.includes("deleted")) return "badge-deleted";
+	return "";
+};
+
+const loadLogs = async () => {
+	try {
+		const response = await fetch(LOGS_URL);
+		const logs = await response.json();
+
+		if (!response.ok) {
+			logsTableBody.innerHTML = `<tr><td colspan="4">Failed to load logs.</td></tr>`;
+			return;
+		}
+
+		if (logs.length === 0) {
+			logsTableBody.innerHTML = `<tr><td colspan="4">No activity logs found.</td></tr>`;
+			return;
+		}
+
+		logsTableBody.innerHTML = "";
+
+		logs.forEach((log) => {
+			const row = document.createElement("tr");
+			row.innerHTML = `
+				<td>${log.id}</td>
+				<td><span class="badge ${getBadgeClass(log.action)}">${log.action}</span></td>
+				<td>${log.description}</td>
+				<td class="log-time">${new Date(log.created_at).toLocaleString()}</td>
+			`;
+			logsTableBody.appendChild(row);
+		});
+	} catch (error) {
+		logsTableBody.innerHTML = `<tr><td colspan="4">Failed to connect to backend.</td></tr>`;
+		console.error("Load logs error:", error);
+	}
+};
+
+loadLogsBtn.addEventListener("click", loadLogs);

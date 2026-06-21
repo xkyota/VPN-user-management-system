@@ -13,6 +13,28 @@
 		</header>
 
 		<main>
+			<section class="card logs-section">
+				<h2>Activity Logs</h2>
+
+				<button id="loadLogsBtn">Load Logs</button>
+
+				<table id="logsTable">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Action</th>
+							<th>Description</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody id="logsTableBody">
+						<tr>
+							<td colspan="4">No logs loaded yet.</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+
 			<section class="card">
 				<h2>Create VPN User</h2>
 
@@ -102,7 +124,7 @@
 					</select>
 				</div>
 
-				<table>
+				<table id="usersTable">
 					<thead>
 						<tr>
 							<th>ID</th>
