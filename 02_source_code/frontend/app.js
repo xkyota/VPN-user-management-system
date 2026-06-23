@@ -1,3 +1,106 @@
+// ─── Auth helpers ───────────────────────────────────────────────
+
+const getToken = () => localStorage.getItem("token");
+
+const authFetch = (url, options = {}) => {
+	return fetch(url, {
+		...options,
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${getToken()}`,
+			...(options.headers || {}),
+		},
+	});
+};
+
+// ─── Pages ──────────────────────────────────────────────────────
+
+const loginPage = document.getElementById("loginPage");
+const appPage = document.getElementById("appPage");
+const headerUserEmail = document.getElementById("headerUserEmail");
+const headerUserRole = document.getElementById("headerUserRole");
+
+const showApp = (email, role) => {
+	loginPage.classList.add("hidden");
+	appPage.classList.remove("hidden");
+	headerUserEmail.textContent = email;
+	headerUserRole.textContent = role;
+	loadUsers();
+};
+
+const showLogin = () => {
+	appPage.classList.add("hidden");
+	loginPage.classList.remove("hidden");
+};
+
+// ─── Login ──────────────────────────────────────────────────────
+
+const loginBtn = document.getElementById("loginBtn");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginError = document.getElementById("loginError");
+
+loginBtn.addEventListener("click", async () => {
+	loginError.textContent = "";
+
+	try {
+		const response = await fetch("http://localhost:3000/api/auth/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				email: loginEmail.value,
+				password: loginPassword.value,
+			}),
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			loginError.textContent = data.error || "Login failed.";
+			return;
+		}
+
+		localStorage.setItem("token", data.token);
+		localStorage.setItem("userEmail", data.email);
+		localStorage.setItem("userRole", data.role);
+
+		showApp(data.email, data.role);
+	} catch (error) {
+		loginError.textContent = "Failed to connect to backend.";
+		console.error("Login error:", error);
+	}
+});
+
+// Allow Enter key on login
+loginPassword.addEventListener("keydown", (e) => {
+	if (e.key === "Enter") loginBtn.click();
+});
+
+// ─── Logout ─────────────────────────────────────────────────────
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+	localStorage.removeItem("token");
+	localStorage.removeItem("userEmail");
+	localStorage.removeItem("userRole");
+	loginEmail.value = "";
+	loginPassword.value = "";
+	showLogin();
+});
+
+// ─── Init ───────────────────────────────────────────────────────
+
+const token = getToken();
+if (token) {
+	showApp(
+		localStorage.getItem("userEmail"),
+		localStorage.getItem("userRole"),
+	);
+} else {
+	showLogin();
+}
+
+// ─── Users ──────────────────────────────────────────────────────
+
 const usersTableBody = document.getElementById("usersTableBody");
 const loadUsersBtn = document.getElementById("loadUsersBtn");
 const createUserForm = document.getElementById("createUserForm");
@@ -19,26 +122,25 @@ const expiredUsersElement = document.getElementById("expiredUsers");
 
 const userDetailsContent = document.getElementById("userDetailsContent");
 
-const logsTableBody = document.getElementById("logsTableBody");
-const loadLogsBtn = document.getElementById("loadLogsBtn");
-
 const API_URL = "http://localhost:3000/api/users";
-const LOGS_URL = "http://localhost:3000/api/activity-logs";
 
 let editingUserId = null;
 let allUsers = [];
 
 const loadUsers = async () => {
 	try {
-		const response = await fetch(API_URL);
+		const response = await authFetch(API_URL);
+
+		if (response.status === 401) {
+			localStorage.removeItem("token");
+			showLogin();
+			return;
+		}
+
 		const users = await response.json();
 
 		if (!response.ok) {
-			usersTableBody.innerHTML = `
-        <tr>
-          <td colspan="7">Failed to load users.</td>
-        </tr>
-      `;
+			usersTableBody.innerHTML = `<tr><td colspan="7">Failed to load users.</td></tr>`;
 			return;
 		}
 
@@ -46,33 +148,22 @@ const loadUsers = async () => {
 		updateDashboard();
 		renderUsers();
 	} catch (error) {
-		usersTableBody.innerHTML = `
-      <tr>
-        <td colspan="7">Failed to connect to backend.</td>
-      </tr>
-    `;
-
+		usersTableBody.innerHTML = `<tr><td colspan="7">Failed to connect to backend.</td></tr>`;
 		console.error("Failed to load users:", error);
 	}
 };
 
 const updateDashboard = () => {
-	const totalUsers = allUsers.length;
-
-	const activeUsers = allUsers.filter(
-		(user) => user.status === "active",
+	totalUsersElement.textContent = allUsers.length;
+	activeUsersElement.textContent = allUsers.filter(
+		(u) => u.status === "active",
 	).length;
-	const inactiveUsers = allUsers.filter(
-		(user) => user.status === "inactive",
+	inactiveUsersElement.textContent = allUsers.filter(
+		(u) => u.status === "inactive",
 	).length;
-	const expiredUsers = allUsers.filter(
-		(user) => user.status === "expired",
+	expiredUsersElement.textContent = allUsers.filter(
+		(u) => u.status === "expired",
 	).length;
-
-	totalUsersElement.textContent = totalUsers;
-	activeUsersElement.textContent = activeUsers;
-	inactiveUsersElement.textContent = inactiveUsers;
-	expiredUsersElement.textContent = expiredUsers;
 };
 
 const renderUsers = () => {
@@ -94,11 +185,7 @@ const renderUsers = () => {
 	usersTableBody.innerHTML = "";
 
 	if (filteredUsers.length === 0) {
-		usersTableBody.innerHTML = `
-      <tr>
-        <td colspan="7">No VPN users found.</td>
-      </tr>
-    `;
+		usersTableBody.innerHTML = `<tr><td colspan="7">No VPN users found.</td></tr>`;
 		return;
 	}
 
@@ -106,95 +193,74 @@ const renderUsers = () => {
 		const row = document.createElement("tr");
 
 		row.innerHTML = `
-      <td>${user.id}</td>
-      <td>${user.full_name}</td>
-      <td>${user.email}</td>
-      <td>${user.vpn_username}</td>
-      <td>${user.status}</td>
-      <td>${new Date(user.expiry_date).toLocaleDateString()}</td>
-      <td>
-        <button class="view-btn">View</button>
-        <button class="edit-btn">Edit</button>
-        <button class="delete-btn">Delete</button>
-      </td>
-    `;
+            <td>${user.id}</td>
+            <td>${user.full_name}</td>
+            <td>${user.email}</td>
+            <td>${user.vpn_username}</td>
+            <td>${user.status}</td>
+            <td>${new Date(user.expiry_date).toLocaleDateString()}</td>
+            <td>
+                <button class="view-btn">View</button>
+                <button class="edit-btn">Edit</button>
+                <button class="delete-btn">Delete</button>
+            </td>
+        `;
 
 		usersTableBody.appendChild(row);
 
-		const viewButton = row.querySelector(".view-btn");
-		const editButton = row.querySelector(".edit-btn");
-		const deleteButton = row.querySelector(".delete-btn");
-
-		viewButton.addEventListener("click", () => {
-			showUserDetails(user);
-		});
-
-		editButton.addEventListener("click", () => {
-			startEditUser(user);
-		});
-
-		deleteButton.addEventListener("click", () => {
-			deleteUser(user.id);
-		});
+		row.querySelector(".view-btn").addEventListener("click", () =>
+			showUserDetails(user),
+		);
+		row.querySelector(".edit-btn").addEventListener("click", () =>
+			startEditUser(user),
+		);
+		row.querySelector(".delete-btn").addEventListener("click", () =>
+			deleteUser(user.id),
+		);
 	});
 };
 
 const showUserDetails = (user) => {
 	userDetailsContent.innerHTML = `
-    <div class="details-card">
-      <p><strong>ID:</strong> ${user.id}</p>
-      <p><strong>Full name:</strong> ${user.full_name}</p>
-      <p><strong>Email:</strong> ${user.email}</p>
-      <p><strong>VPN username:</strong> ${user.vpn_username}</p>
-      <p><strong>Status:</strong> ${user.status}</p>
-      <p><strong>Expiry date:</strong> ${new Date(
-			user.expiry_date,
-		).toLocaleDateString()}</p>
-      <p><strong>Created at:</strong> ${new Date(
-			user.created_at,
-		).toLocaleString()}</p>
-      <p><strong>Updated at:</strong> ${new Date(
-			user.updated_at,
-		).toLocaleString()}</p>
-    </div>
-  `;
+        <div class="details-card">
+            <p><strong>ID:</strong> ${user.id}</p>
+            <p><strong>Full name:</strong> ${user.full_name}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <p><strong>VPN username:</strong> ${user.vpn_username}</p>
+            <p><strong>Status:</strong> ${user.status}</p>
+            <p><strong>Expiry date:</strong> ${new Date(user.expiry_date).toLocaleDateString()}</p>
+            <p><strong>Created at:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+            <p><strong>Updated at:</strong> ${new Date(user.updated_at).toLocaleString()}</p>
+        </div>
+    `;
 };
 
 const startEditUser = (user) => {
 	editingUserId = user.id;
-
 	fullNameInput.value = user.full_name;
 	emailInput.value = user.email;
 	vpnUsernameInput.value = user.vpn_username;
 	statusInput.value = user.status;
 	expiryDateInput.value = user.expiry_date.split("T")[0];
-
 	formMessage.textContent = `Editing user ID: ${user.id}`;
-
-	const submitButton = createUserForm.querySelector("button[type='submit']");
-	submitButton.textContent = "Update User";
+	createUserForm.querySelector("button[type='submit']").textContent =
+		"Update User";
 };
 
 const resetFormMode = () => {
 	editingUserId = null;
 	createUserForm.reset();
-
-	const submitButton = createUserForm.querySelector("button[type='submit']");
-	submitButton.textContent = "Create User";
+	createUserForm.querySelector("button[type='submit']").textContent =
+		"Create User";
 };
 
 const deleteUser = async (id) => {
-	const confirmed = confirm("Are you sure you want to delete this VPN user?");
-
-	if (!confirmed) {
-		return;
-	}
+	if (!confirm("Are you sure you want to delete this VPN user?")) return;
 
 	try {
-		const response = await fetch(`${API_URL}/${id}`, {
+		const response = await authFetch(`${API_URL}/${id}`, {
 			method: "DELETE",
 		});
-
 		const data = await response.json();
 
 		if (!response.ok) {
@@ -225,11 +291,8 @@ createUserForm.addEventListener("submit", async (event) => {
 	const method = editingUserId ? "PUT" : "POST";
 
 	try {
-		const response = await fetch(url, {
+		const response = await authFetch(url, {
 			method,
-			headers: {
-				"Content-Type": "application/json",
-			},
 			body: JSON.stringify(userData),
 		});
 
@@ -257,7 +320,11 @@ loadUsersBtn.addEventListener("click", loadUsers);
 searchInput.addEventListener("input", renderUsers);
 statusFilter.addEventListener("change", renderUsers);
 
-loadUsers();
+// ─── Activity Logs ───────────────────────────────────────────────
+
+const logsTableBody = document.getElementById("logsTableBody");
+const loadLogsBtn = document.getElementById("loadLogsBtn");
+const LOGS_URL = "http://localhost:3000/api/activity-logs";
 
 const getBadgeClass = (action) => {
 	if (action.includes("created")) return "badge-created";
@@ -268,7 +335,7 @@ const getBadgeClass = (action) => {
 
 const loadLogs = async () => {
 	try {
-		const response = await fetch(LOGS_URL);
+		const response = await authFetch(LOGS_URL);
 		const logs = await response.json();
 
 		if (!response.ok) {
@@ -286,11 +353,11 @@ const loadLogs = async () => {
 		logs.forEach((log) => {
 			const row = document.createElement("tr");
 			row.innerHTML = `
-				<td>${log.id}</td>
-				<td><span class="badge ${getBadgeClass(log.action)}">${log.action}</span></td>
-				<td>${log.description}</td>
-				<td class="log-time">${new Date(log.created_at).toLocaleString()}</td>
-			`;
+                <td>${log.id}</td>
+                <td><span class="badge ${getBadgeClass(log.action)}">${log.action}</span></td>
+                <td>${log.description}</td>
+                <td class="log-time">${new Date(log.created_at).toLocaleString()}</td>
+            `;
 			logsTableBody.appendChild(row);
 		});
 	} catch (error) {
