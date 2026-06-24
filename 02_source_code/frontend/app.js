@@ -87,18 +87,6 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 	showLogin();
 });
 
-// ─── Init ───────────────────────────────────────────────────────
-
-const token = getToken();
-if (token) {
-	showApp(
-		localStorage.getItem("userEmail"),
-		localStorage.getItem("userRole"),
-	);
-} else {
-	showLogin();
-}
-
 // ─── Users ──────────────────────────────────────────────────────
 
 const usersTableBody = document.getElementById("usersTableBody");
@@ -367,3 +355,15 @@ const loadLogs = async () => {
 };
 
 loadLogsBtn.addEventListener("click", loadLogs);
+
+// ─── Init ───────────────────────────────────────────────────────
+
+const token = getToken();
+if (token) {
+	showApp(
+		localStorage.getItem("userEmail"),
+		localStorage.getItem("userRole"),
+	);
+} else {
+	showLogin();
+}

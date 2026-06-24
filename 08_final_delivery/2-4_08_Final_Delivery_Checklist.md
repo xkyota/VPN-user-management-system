@@ -2,31 +2,31 @@
 
 ## GitHub Repository
 
-- Repository is public or shared with the supervisor.
-- README explains how to run the project.
-- Folder structure is clean.
-- Commit history shows regular work.
+- [x] Repository is public or shared with the supervisor.
+- [x] README explains how to run the project.
+- [x] Folder structure is clean.
+- [x] Commit history shows regular work.
 
 ## Application
 
-- Application runs locally.
-- Docker Compose starts required services.
-- Database is initialised from scripts.
-- Main features are implemented.
-- Input validation is present.
+- [x] Application runs locally.
+- [x] Docker Compose starts required services.
+- [x] Database is initialised from scripts.
+- [x] Main features are implemented.
+- [x] Input validation is present.
 
 ## Documentation
 
-- Detailed requirements are present.
-- Setup guide is present.
-- Database documentation is present.
-- Test cases are present.
-- Weekly reports are completed.
-- Final report is completed.
+- [x] Detailed requirements are present.
+- [x] Setup guide is present.
+- [x] Database documentation is present.
+- [x] Test cases are present.
+- [x] Weekly reports are completed.
+- [x] Final report is completed.
 
 ## Evidence
 
-- Screenshots show application pages.
-- Screenshots show Docker containers.
-- Screenshots show database or logs.
-- Test results are documented.
+- [x] Screenshots show application pages.
+- [x] Screenshots show Docker containers.
+- [x] Screenshots show database or logs.
+- [x] Test results are documented.
